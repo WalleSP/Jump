@@ -18,6 +18,13 @@ let playerY = 375;
 let velocityX = 0;
 let velocityY = 0;
 
+// Hinder object
+let obstacleX = 0;
+let obstacleY = 0;
+let obstacleSize = 25;
+let obstacleSpeed = 5;
+let obstaclesArray = [];
+
 // Oppdateringshastighet og hopp
 let updateSpeed = 20;
 let jumpSpeed = 5;
@@ -45,6 +52,33 @@ function update() {
   context.fillStyle = 'red';
   // Lager et kvadrat nede til høyre som blir spilleren
   context.fillRect(playerX, playerY, 25, 25);
+
+  // Obstacles bevegelse
+  if (obstaclesArray.length > 0) {
+    for (let i = 0; i < obstaclesArray.length; i++) {
+      obstaclesArray[i][0] -= obstacleSpeed
+
+      // Endrer penselen til gul 
+      context.fillStyle = "yellow"
+      context.fillRect(obstaclesArray[i][0], obstaclesArray[i][1], obstacleSize, obstacleSize)
+      console.log(obstaclesArray[i])
+      // Hvis den obstacle er utenfor rekkevidde fjernes den
+      if (obstaclesArray[i][0] < -50) {
+        obstaclesArray.splice(i,1);
+        i--;
+      }
+      // Hvis obstaclesArray x og y rører spiller vises game over.
+      if (obstaclesArray[i][0] >= playerX && obstaclesArray[i][0] <= (playerX + 25) 
+      && obstaclesArray[i][1] >= playerY && obstaclesArray[i][1] <= (playerY + 25)) {
+        console.log("Game Over!")
+        clearInterval(gameUpdating)
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+        }
+
+      }
+  }
 }
 
 // Lager eventlistener hvor en knapp er trykket kjører funksjonen jump
@@ -62,7 +96,7 @@ function jump(e) {
       counting += 1;
 
       // Når counting har telt til 15 skal den komme ned igjen
-      if (counting === 15) {
+      if (counting === 20) {
         clearInterval(timerID);
 
         velocityY = 0;
@@ -81,3 +115,12 @@ function jump(e) {
     }, updateSpeed);
   }
 }
+
+// Pusher arrayen ut til html
+function createObstacle() {
+  obstaclesArray.push([canvas.width, (canvas.height - obstacleSize)])
+  console.log(obstaclesArray[0][0])
+}
+
+// Kaller på funksjonen i intervall
+setInterval(createObstacle, 2000);
